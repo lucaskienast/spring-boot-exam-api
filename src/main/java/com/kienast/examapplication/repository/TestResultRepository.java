@@ -1,12 +1,9 @@
 package com.kienast.examapplication.repository;
 
-import com.kienast.examapplication.model.Test;
+import com.kienast.examapplication.model.TestResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TestRepository extends JpaRepository<Test, Long> {
-
-    public Test findTestByTestName(String testName);
-
+public interface TestResultRepository extends JpaRepository<TestResult, Long> {
 }

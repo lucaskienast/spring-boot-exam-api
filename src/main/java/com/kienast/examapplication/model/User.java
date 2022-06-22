@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
+import static javax.persistence.GenerationType.AUTO;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -11,20 +12,20 @@ import static javax.persistence.GenerationType.IDENTITY;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = AUTO)
     @Column(name = "USER_ID")
     private Long userId;
 
-    @Column(name = "USERNAME", nullable = false)
+    @Column(name = "USERNAME", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "EMAIL", nullable = false)
+    @Column(name = "EMAIL", nullable = false, unique = true)
     private String email;
 
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 
-    @Column(name = "CREATED_AT", nullable = false)
+    @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private Date createdAt;
 
     public User() {

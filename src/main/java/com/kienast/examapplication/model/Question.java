@@ -1,9 +1,10 @@
 package com.kienast.examapplication.model;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -18,16 +19,19 @@ public class Question {
     @Column(name = "QUESTION_NAME", nullable = false)
     private String questionName;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "testId")
-    private Test testId;
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "TEST_ID")
+    private Test test;
+
+    @OneToMany(mappedBy = "question")
+    private List<PossibleAnswer> possibleAnswers;
 
     public Question() {
     }
 
-    public Question(String questionName, Test testId) {
+    public Question(String questionName, Test test) {
         this.questionName = questionName;
-        this.testId = testId;
+        this.test = test;
     }
 
     public Long getQuestionId() {
@@ -46,25 +50,29 @@ public class Question {
         this.questionName = questionName;
     }
 
-    public Test getTestId() {
-        return testId;
+    public Test getTest() {
+        return test;
     }
 
-    public void setTestId(Test testId) {
-        this.testId = testId;
+    public void setTest(Test test) {
+        this.test = test;
     }
+
+    public List<PossibleAnswer> getPossibleAnswers() {return possibleAnswers;}
+
+    public void setPossibleAnswers(List<PossibleAnswer> possibleAnswers) {this.possibleAnswers = possibleAnswers;}
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Question question = (Question) o;
-        return Objects.equals(questionId, question.questionId) && Objects.equals(questionName, question.questionName) && Objects.equals(testId, question.testId);
+        return Objects.equals(questionId, question.questionId) && Objects.equals(questionName, question.questionName) && Objects.equals(test, question.test);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(questionId, questionName, testId);
+        return Objects.hash(questionId, questionName, test);
     }
 
     @Override
@@ -72,7 +80,7 @@ public class Question {
         return "Question{" +
                 "questionId=" + questionId +
                 ", questionName='" + questionName + '\'' +
-                ", testId=" + testId +
+                ", testId=" + test +
                 '}';
     }
 }

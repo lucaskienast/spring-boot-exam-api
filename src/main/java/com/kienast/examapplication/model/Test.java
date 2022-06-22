@@ -3,9 +3,10 @@ package com.kienast.examapplication.model;
 import javax.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -20,19 +21,26 @@ public class Test {
     @Column(name = "TEST_NAME", nullable = false)
     private String testName;
 
-    @Column(name = "CREATED_AT", nullable = false)
-    private Date createdAt;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "userId")
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "USER_ID")
     private User createdBy;
+
+    @OneToMany(mappedBy = "test", fetch = EAGER)
+    private List<Question> questions;
+
+    @Column(
+            name = "CREATED_AT",
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            nullable = false,
+            updatable = false
+    )
+    private Date createdAt;
 
     public Test() {
     }
 
-    public Test(String testName, Date createdAt, User createdBy) {
+    public Test(String testName, User createdBy) {
         this.testName = testName;
-        this.createdAt = createdAt;
         this.createdBy = createdBy;
     }
 
@@ -67,6 +75,10 @@ public class Test {
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
+
+    public List<Question> getQuestions() {return questions;}
+
+    public void setQuestions(List<Question> questions) {this.questions = questions;}
 
     @Override
     public boolean equals(Object o) {

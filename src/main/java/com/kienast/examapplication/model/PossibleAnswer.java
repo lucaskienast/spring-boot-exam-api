@@ -3,7 +3,7 @@ package com.kienast.examapplication.model;
 import javax.persistence.*;
 import java.util.Objects;
 
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -21,17 +21,17 @@ public class PossibleAnswer {
     @Column(name = "IS_CORRECT", nullable = false)
     private boolean isCorrect;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "questionId")
-    private Test questionId;
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "QUESTION_ID")
+    private Question question;
 
     public PossibleAnswer() {
     }
 
-    public PossibleAnswer(String answer, boolean isCorrect, Test questionId) {
+    public PossibleAnswer(String answer, boolean isCorrect, Question question) {
         this.answer = answer;
         this.isCorrect = isCorrect;
-        this.questionId = questionId;
+        this.question = question;
     }
 
     public Long getPossibleAnswerId() {
@@ -58,12 +58,12 @@ public class PossibleAnswer {
         isCorrect = correct;
     }
 
-    public Test getQuestionId() {
-        return questionId;
+    public Question getQuestion() {
+        return question;
     }
 
-    public void setQuestionId(Test questionId) {
-        this.questionId = questionId;
+    public void setQuestion(Question question) {
+        this.question = question;
     }
 
     @Override
@@ -71,12 +71,12 @@ public class PossibleAnswer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PossibleAnswer that = (PossibleAnswer) o;
-        return isCorrect == that.isCorrect && Objects.equals(possibleAnswerId, that.possibleAnswerId) && Objects.equals(answer, that.answer) && Objects.equals(questionId, that.questionId);
+        return isCorrect == that.isCorrect && Objects.equals(possibleAnswerId, that.possibleAnswerId) && Objects.equals(answer, that.answer) && Objects.equals(question, that.question);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(possibleAnswerId, answer, isCorrect, questionId);
+        return Objects.hash(possibleAnswerId, answer, isCorrect, question);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class PossibleAnswer {
                 "possibleAnswerId=" + possibleAnswerId +
                 ", answer='" + answer + '\'' +
                 ", isCorrect=" + isCorrect +
-                ", questionId=" + questionId +
+                ", questionId=" + question +
                 '}';
     }
 }
