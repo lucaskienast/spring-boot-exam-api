@@ -27,10 +27,10 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody User user) {
-        LOG.info("AuthController: signup with user -> " + user);
-        String response = this.authService.signup(user);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<User> signup(@RequestBody User givenUser) {
+        LOG.info("AuthController: signup with user -> " + givenUser);
+        User user = this.authService.signup(givenUser);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
 

@@ -1,5 +1,7 @@
 package com.kienast.examapplication.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 
 import java.util.Date;
@@ -18,7 +20,7 @@ public class Test {
     @Column(name = "TEST_ID")
     private Long testId;
 
-    @Column(name = "TEST_NAME", nullable = false)
+    @Column(name = "TEST_NAME", nullable = false, unique = true)
     private String testName;
 
     @ManyToOne(fetch = EAGER)
@@ -26,14 +28,10 @@ public class Test {
     private User createdBy;
 
     @OneToMany(mappedBy = "test", fetch = EAGER)
+    @JsonManagedReference
     private List<Question> questions;
 
-    @Column(
-            name = "CREATED_AT",
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            nullable = false,
-            updatable = false
-    )
+    @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private Date createdAt;
 
     public Test() {

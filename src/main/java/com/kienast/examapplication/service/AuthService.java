@@ -20,31 +20,34 @@ public class AuthService {
 
     @Autowired
     public AuthService(UserRepository userRepository) {
+        LOG.info("AuthService: constructor called");
         this.userRepository = userRepository;
     }
 
 
-    public String signup(User givenUser) {
+    public User signup(User givenUser) {
+        LOG.info("AuthService: signup givenUser -> {}", givenUser);
         User user = new User();
         user.setUsername(givenUser.getUsername());
         user.setEmail(givenUser.getEmail());
         user.setPassword(givenUser.getPassword());
         user.setCreatedAt(new Date());
 
-        LOG.info("AuthService: signup user: " + user);
-
+        LOG.info("AuthService: unsaved user: " + user);
         this.userRepository.save(user);
-        LOG.info("AuthService: signup successful");
+        LOG.info("AuthService: saved user: " + user);
 
-        return "success";
+        return user;
     }
 
 
     public User login(User givenUser) {
+        LOG.info("AuthService: login givenUser -> {}", givenUser);
         User user = this.userRepository.findUserByUsername(givenUser.getUsername());
+        LOG.info("AuthService: found user -> {}", user);
 
         if (user == null) {
-            LOG.error("AuthService: login did not find user: " + user);
+            LOG.error("AuthService: login did not find givenUser -> {}" + givenUser);
             return null;
         }
 

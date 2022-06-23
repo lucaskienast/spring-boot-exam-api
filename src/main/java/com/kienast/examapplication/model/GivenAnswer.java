@@ -1,5 +1,7 @@
 package com.kienast.examapplication.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 import java.util.Date;
@@ -19,10 +21,12 @@ public class GivenAnswer {
 
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "POSSIBLE_ANSWER_ID")
+    @JsonBackReference
     private PossibleAnswer answer;
 
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "TEST_RESULT_ID")
+    @JsonBackReference
     private TestResult testResult;
 
     @Column(name = "CREATED_AT", nullable = false)

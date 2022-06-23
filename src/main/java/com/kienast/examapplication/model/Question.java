@@ -1,5 +1,8 @@
 package com.kienast.examapplication.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -21,9 +24,11 @@ public class Question {
 
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "TEST_ID")
+    @JsonBackReference
     private Test test;
 
     @OneToMany(mappedBy = "question")
+    @JsonManagedReference
     private List<PossibleAnswer> possibleAnswers;
 
     public Question() {

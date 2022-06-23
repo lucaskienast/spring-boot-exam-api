@@ -1,10 +1,11 @@
 package com.kienast.examapplication.controller;
 
-import com.kienast.examapplication.dto.CreateTestDto;
-import com.kienast.examapplication.dto.SendTestDto;
-import com.kienast.examapplication.model.GivenAnswer;
+import com.kienast.examapplication.dto.CreateTestDto2;
+import com.kienast.examapplication.dto.SendTestResultDto;
 import com.kienast.examapplication.model.Test;
 import com.kienast.examapplication.service.TestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,42 +15,45 @@ import java.util.List;
 @RequestMapping("/api/tests")
 public class TestController {
 
-    // setup logging
+    private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
     private final TestService testService;
+
 
     public TestController(TestService testService) {
         this.testService = testService;
     }
 
 
-    // return tests with all attributes from EAGER loading
     @GetMapping
     public ResponseEntity<List<Test>> getAllTests() {
+        LOG.info("TestController: getAllTests");
         List<Test> testList = this.testService.getAllTests();
         return new ResponseEntity<>(testList, HttpStatus.OK);
     }
 
 
-    // return test with all attributes from EAGER loading
     @GetMapping("/{testId}")
     public ResponseEntity<Test> getTestById(@PathVariable String testId) {
+        LOG.info("TestController: getTestById testId -> {}", testId);
         Test test = this.testService.getTestById(Long.parseLong(testId));
         return new ResponseEntity<>(test, HttpStatus.OK);
     }
 
 
     @PostMapping("/create")
-    public ResponseEntity<String> createNewTest(@RequestBody CreateTestDto createTestDto) {
+    public ResponseEntity<String> createNewTest(@RequestBody CreateTestDto2 createTestDto) {
+        LOG.info("TestController: createNewTest createTestDto -> {}", createTestDto);
         String response = this.testService.createNewTest(createTestDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    /** in progress */
+
     @PostMapping("/send")
-    public ResponseEntity<String> sendTestWithAnswers(@RequestBody SendTestDto sendTestDto) {
-        String response = this.testService.sendTestWithAnswers(sendTestDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<String> sendTestWithAnswers(@RequestBody SendTestResultDto sendTestResultDto) {
+        LOG.info("TestController: sendTestWithAnswers sendTestResultDto -> {}", sendTestResultDto);
+        String response = this.testService.sendTestWithAnswers(sendTestResultDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 

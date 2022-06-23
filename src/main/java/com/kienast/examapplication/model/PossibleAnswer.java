@@ -1,5 +1,7 @@
 package com.kienast.examapplication.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -23,6 +25,7 @@ public class PossibleAnswer {
 
     @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "QUESTION_ID")
+    @JsonBackReference
     private Question question;
 
     public PossibleAnswer() {
