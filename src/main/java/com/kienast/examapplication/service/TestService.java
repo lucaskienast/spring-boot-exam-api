@@ -3,6 +3,7 @@ package com.kienast.examapplication.service;
 import com.kienast.examapplication.dto.*;
 import com.kienast.examapplication.model.*;
 import com.kienast.examapplication.repository.GivenAnswerRepository;
+import com.kienast.examapplication.repository.PossibleAnswerRepository;
 import com.kienast.examapplication.repository.TestRepository;
 import com.kienast.examapplication.repository.TestResultRepository;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class TestService {
     private final TestRepository testRepository;
     private final TestResultRepository testResultRepository;
     private final GivenAnswerRepository givenAnswerRepository;
+    private final PossibleAnswerRepository possibleAnswerRepository;
     private final AuthService authService;
     private final QuestionService questionService;
     private final AnswerService answerService;
@@ -31,10 +33,11 @@ public class TestService {
     @Autowired
     public TestService(TestRepository testRepository,
                        TestResultRepository testResultRepository,
-                       GivenAnswerRepository givenAnswRepository, AuthService authService,
+                       GivenAnswerRepository givenAnswerRepository, PossibleAnswerRepository possibleAnswerRepository, AuthService authService,
                        QuestionService questionService,
                        AnswerService answerService) {
-        this.givenAnswerRepository = givenAnswRepository;
+        this.givenAnswerRepository = givenAnswerRepository;
+        this.possibleAnswerRepository = possibleAnswerRepository;
 
         LOG.info("TestService: constructor called");
         this.testRepository = testRepository;
@@ -58,8 +61,6 @@ public class TestService {
         Optional<Test> optionalTest = this.testRepository.findById(testId);
 
         if (optionalTest.isPresent()) {
-            ReceiveTestDto receiveTestDto = new ReceiveTestDto();
-            //receiveTestDto.setId(testId);
             Test test = optionalTest.get();
             LOG.info("TestService: getTestById found test -> {}", test);
             return test;
@@ -67,6 +68,79 @@ public class TestService {
 
         LOG.info("TestService: getTestById did not find test with id -> {}", testId);
         return null;
+    }
+
+
+    public WholeTestDto getTestWithQuestionsAndResultsById(Long testId) {
+        Test test = getTestById(testId);
+
+        UserDto userDto = new UserDto();
+        userDto.setUserId(test.getCreatedBy().getUserId());
+        userDto.setUsername(test.getCreatedBy().getUsername());
+        userDto.setEmail(test.getCreatedBy().getEmail());
+
+        List<Question> questions = questionService.getAllQuestionsByTest(test);
+        List<QuestionDto> questionDtos = new ArrayList<>();
+
+        for (Question question : questions) {
+            List<PossibleAnswer> possibleAnswers = this.possibleAnswerRepository.findAllByQuestion(question);
+            List<PossibleAnswerDto> possibleAnswerDtos = new ArrayList<>();
+
+            for (PossibleAnswer possibleAnswer : possibleAnswers) {
+                PossibleAnswerDto possibleAnswerDto = new PossibleAnswerDto();
+                possibleAnswerDto.setPossibleAnswerId(possibleAnswer.getPossibleAnswerId());
+                possibleAnswerDto.setAnswer(possibleAnswer.getAnswer());
+                possibleAnswerDto.setCorrect(possibleAnswer.isCorrect());
+                possibleAnswerDtos.add(possibleAnswerDto);
+            }
+
+            QuestionDto questionDto = new QuestionDto();
+            questionDto.setQuestionId(question.getQuestionId());
+            questionDto.setQuestionName(question.getQuestionName());
+            questionDto.setPossibleAnswers(possibleAnswerDtos);
+            questionDtos.add(questionDto);
+        }
+
+        List<TestResult> testResults = getTestResultsForTest(test);
+        List<TestResultDto> testResultDtos = new ArrayList<>();
+
+        for (TestResult testResult : testResults) {
+            List<GivenAnswer> givenAnswers = this.givenAnswerRepository.findGivenAnswerByTestResult(testResult);
+            List<GivenAnswerDto> givenAnswerDtos = new ArrayList<>();
+
+            for (GivenAnswer givenAnswer : givenAnswers) {
+
+                PossibleAnswer possibleAnswer = givenAnswer.getAnswer();
+                PossibleAnswerDto possibleAnswerDto = new PossibleAnswerDto();
+                possibleAnswerDto.setPossibleAnswerId(possibleAnswer.getPossibleAnswerId());
+                possibleAnswerDto.setAnswer(possibleAnswer.getAnswer());
+                possibleAnswerDto.setCorrect(possibleAnswer.isCorrect());
+
+                GivenAnswerDto givenAnswerDto = new GivenAnswerDto();
+                givenAnswerDto.setGivenAnswerId(givenAnswer.getGivenAnswerId());
+                givenAnswerDto.setPossibleAnswerDto(possibleAnswerDto);
+
+                givenAnswerDtos.add(givenAnswerDto);
+            }
+
+            TestResultDto testResultDto = new TestResultDto();
+            testResultDto.setTestResultId(testResult.getTestResultId());
+            testResultDto.setResult(testResult.getResult());
+            testResultDto.setGivenAnswerDtos(givenAnswerDtos);
+            testResultDto.setUserDto(userDto);
+
+            testResultDtos.add(testResultDto);
+        }
+
+        WholeTestDto wholeTest = new WholeTestDto();
+        wholeTest.setTestId(test.getTestId());
+        wholeTest.setTestName(test.getTestName());
+        wholeTest.setUserDto(userDto);
+        wholeTest.setCreatedAt(test.getCreatedAt());
+        wholeTest.setQuestionDtos(questionDtos);
+        wholeTest.setTestResultDtos(testResultDtos);
+
+        return wholeTest;
     }
 
 
@@ -90,7 +164,7 @@ public class TestService {
 
         if (user == null) {
             LOG.info("TestService: createNewTest did not find user");
-            return "Test creation failed, because user credentials not valid.";
+            return "401 Unauthorized";
         }
 
         Test test = new Test();
@@ -121,7 +195,7 @@ public class TestService {
 
         this.questionService.saveQuestions(questions);
 
-        return "Test creation successful!";
+        return "201 CREATED";
     }
 
 
@@ -133,7 +207,7 @@ public class TestService {
         User user = this.authService.login(givenUser);
 
         if (user == null) {
-            return "Test sending failed, because user not found.";
+            return "401 Unauthorized";
         }
 
         Test test = getTestById(sendTestResultDto.getTestDto().getTestId());
@@ -160,7 +234,7 @@ public class TestService {
 
         this.answerService.saveGivenAnswers(givenAnswers);
 
-        return "Test sending successful!";
+        return "201 CREATED";
     }
 
 

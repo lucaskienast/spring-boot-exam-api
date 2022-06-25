@@ -38,6 +38,9 @@ public class AuthController {
     public ResponseEntity<User> login(@RequestBody User givenUser) {
         LOG.info("AuthController: login with user -> " + givenUser);
         User user = this.authService.login(givenUser);
+        if (user == null) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        }
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 

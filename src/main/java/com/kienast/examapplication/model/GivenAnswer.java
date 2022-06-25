@@ -91,7 +91,6 @@ public class GivenAnswer {
         return "GivenAnswer{" +
                 "givenAnswerId=" + givenAnswerId +
                 ", answer=" + answer +
-                ", testResult=" + testResult +
                 ", createdAt=" + createdAt +
                 '}';
     }

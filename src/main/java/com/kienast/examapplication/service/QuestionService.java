@@ -2,6 +2,7 @@ package com.kienast.examapplication.service;
 
 import com.kienast.examapplication.model.PossibleAnswer;
 import com.kienast.examapplication.model.Question;
+import com.kienast.examapplication.model.Test;
 import com.kienast.examapplication.repository.QuestionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,13 @@ public class QuestionService {
 
             this.answerService.savePossibleAnswers(possibleAnswers);
         }
+    }
+
+    public List<Question> getAllQuestionsByTest(Test test) {
+        LOG.info("QuestionService: getAllQuestionsByTest test -> {}", test);
+        List<Question> questions = questionRepository.findAllByTest(test);
+        LOG.info("QuestionService: getAllQuestionsByTest questions -> {}", questions);
+        return questions;
     }
 
 

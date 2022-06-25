@@ -1,8 +1,10 @@
 package com.kienast.examapplication.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 import static javax.persistence.FetchType.EAGER;
@@ -27,6 +29,10 @@ public class PossibleAnswer {
     @JoinColumn(name = "QUESTION_ID")
     @JsonBackReference
     private Question question;
+
+    @OneToMany(mappedBy = "answer")
+    @JsonManagedReference
+    private List<GivenAnswer> givenAnswers;
 
     public PossibleAnswer() {
     }
