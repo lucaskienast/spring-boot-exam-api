@@ -7,16 +7,16 @@ public class SendTestResultDto {
 
     private Double result;
     private UserDto userDto;
-    private TestDto testDto;
-    private List<SendTestResultGivenAnswerDto> givenAnswers;
+    private TestDto examDto;
+    private List<GivenAnswerDto> givenAnswers;
 
     public SendTestResultDto() {
     }
 
-    public SendTestResultDto(Double result, UserDto userDto, TestDto testDto, List<SendTestResultGivenAnswerDto> givenAnswers) {
+    public SendTestResultDto(Double result, UserDto userDto, TestDto examDto, List<GivenAnswerDto> givenAnswers) {
         this.result = result;
         this.userDto = userDto;
-        this.testDto = testDto;
+        this.examDto = examDto;
         this.givenAnswers = givenAnswers;
     }
 
@@ -36,19 +36,19 @@ public class SendTestResultDto {
         this.userDto = userDto;
     }
 
-    public TestDto getTestDto() {
-        return testDto;
+    public TestDto getExamDto() {
+        return examDto;
     }
 
-    public void setTestDto(TestDto testDto) {
-        this.testDto = testDto;
+    public void setExamDto(TestDto examDto) {
+        this.examDto = examDto;
     }
 
-    public List<SendTestResultGivenAnswerDto> getGivenAnswers() {
+    public List<GivenAnswerDto> getGivenAnswers() {
         return givenAnswers;
     }
 
-    public void setGivenAnswers(List<SendTestResultGivenAnswerDto> givenAnswers) {
+    public void setGivenAnswers(List<GivenAnswerDto> givenAnswers) {
         this.givenAnswers = givenAnswers;
     }
 
@@ -57,12 +57,12 @@ public class SendTestResultDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SendTestResultDto that = (SendTestResultDto) o;
-        return Objects.equals(result, that.result) && Objects.equals(userDto, that.userDto) && Objects.equals(testDto, that.testDto) && Objects.equals(givenAnswers, that.givenAnswers);
+        return Objects.equals(result, that.result) && Objects.equals(userDto, that.userDto) && Objects.equals(examDto, that.examDto) && Objects.equals(givenAnswers, that.givenAnswers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(result, userDto, testDto, givenAnswers);
+        return Objects.hash(result, userDto, examDto, givenAnswers);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SendTestResultDto {
         return "SendTestResultDto{" +
                 "result=" + result +
                 ", userDto=" + userDto +
-                ", testDto=" + testDto +
+                ", examDto=" + examDto +
                 ", givenAnswers=" + givenAnswers +
                 '}';
     }

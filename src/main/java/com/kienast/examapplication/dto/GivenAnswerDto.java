@@ -5,14 +5,14 @@ import java.util.Objects;
 public class GivenAnswerDto {
 
     private Long givenAnswerId;
-    private PossibleAnswerDto possibleAnswerDto;
+    private PossibleAnswerDto possibleAnswer;
 
     public GivenAnswerDto() {
     }
 
-    public GivenAnswerDto(Long givenAnswerId, PossibleAnswerDto possibleAnswerDto) {
+    public GivenAnswerDto(Long givenAnswerId, PossibleAnswerDto possibleAnswer) {
         this.givenAnswerId = givenAnswerId;
-        this.possibleAnswerDto = possibleAnswerDto;
+        this.possibleAnswer = possibleAnswer;
     }
 
     public Long getGivenAnswerId() {
@@ -23,12 +23,12 @@ public class GivenAnswerDto {
         this.givenAnswerId = givenAnswerId;
     }
 
-    public PossibleAnswerDto getPossibleAnswerDto() {
-        return possibleAnswerDto;
+    public PossibleAnswerDto getPossibleAnswer() {
+        return possibleAnswer;
     }
 
-    public void setPossibleAnswerDto(PossibleAnswerDto possibleAnswerDto) {
-        this.possibleAnswerDto = possibleAnswerDto;
+    public void setPossibleAnswer(PossibleAnswerDto possibleAnswer) {
+        this.possibleAnswer = possibleAnswer;
     }
 
     @Override
@@ -36,19 +36,19 @@ public class GivenAnswerDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GivenAnswerDto that = (GivenAnswerDto) o;
-        return Objects.equals(givenAnswerId, that.givenAnswerId) && Objects.equals(possibleAnswerDto, that.possibleAnswerDto);
+        return Objects.equals(givenAnswerId, that.givenAnswerId) && Objects.equals(possibleAnswer, that.possibleAnswer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(givenAnswerId, possibleAnswerDto);
+        return Objects.hash(givenAnswerId, possibleAnswer);
     }
 
     @Override
     public String toString() {
         return "GivenAnswerDto{" +
                 "givenAnswerId=" + givenAnswerId +
-                ", possibleAnswerDto=" + possibleAnswerDto +
+                ", possibleAnswer=" + possibleAnswer +
                 '}';
     }
 }

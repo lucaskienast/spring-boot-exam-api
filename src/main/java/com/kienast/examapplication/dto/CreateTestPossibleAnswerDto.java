@@ -5,14 +5,14 @@ import java.util.Objects;
 public class CreateTestPossibleAnswerDto {
 
     private String answer;
-    private boolean isCorrect;
+    private boolean correct;
 
     public CreateTestPossibleAnswerDto() {
     }
 
-    public CreateTestPossibleAnswerDto(String answer, boolean isCorrect) {
+    public CreateTestPossibleAnswerDto(String answer, boolean correct) {
         this.answer = answer;
-        this.isCorrect = isCorrect;
+        this.correct = correct;
     }
 
     public String getAnswer() {
@@ -24,11 +24,11 @@ public class CreateTestPossibleAnswerDto {
     }
 
     public boolean isCorrect() {
-        return isCorrect;
+        return correct;
     }
 
     public void setCorrect(boolean correct) {
-        isCorrect = correct;
+        this.correct = correct;
     }
 
     @Override
@@ -36,19 +36,19 @@ public class CreateTestPossibleAnswerDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CreateTestPossibleAnswerDto that = (CreateTestPossibleAnswerDto) o;
-        return isCorrect == that.isCorrect && Objects.equals(answer, that.answer);
+        return correct == that.correct && Objects.equals(answer, that.answer);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(answer, isCorrect);
+        return Objects.hash(answer, correct);
     }
 
     @Override
     public String toString() {
         return "CreateTestPossibleAnswerDto{" +
                 "answer='" + answer + '\'' +
-                ", isCorrect=" + isCorrect +
+                ", correct=" + correct +
                 '}';
     }
 }

@@ -2,16 +2,16 @@ package com.kienast.examapplication.dto;
 
 import java.util.Objects;
 
-public class TestDto {
+public class ExamDto {
 
     private Long examId;
     private String examName;
     private UserDto userDto;
 
-    public TestDto() {
+    public ExamDto() {
     }
 
-    public TestDto(Long examId, String examName, UserDto userDto) {
+    public ExamDto(Long examId, String examName, UserDto userDto) {
         this.examId = examId;
         this.examName = examName;
         this.userDto = userDto;
@@ -45,8 +45,8 @@ public class TestDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TestDto testDto = (TestDto) o;
-        return Objects.equals(examId, testDto.examId) && Objects.equals(examName, testDto.examName) && Objects.equals(userDto, testDto.userDto);
+        ExamDto examDto = (ExamDto) o;
+        return Objects.equals(examId, examDto.examId) && Objects.equals(examName, examDto.examName) && Objects.equals(userDto, examDto.userDto);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class TestDto {
 
     @Override
     public String toString() {
-        return "TestDto{" +
+        return "ExamDto{" +
                 "examId=" + examId +
                 ", examName='" + examName + '\'' +
                 ", userDto=" + userDto +

@@ -49,10 +49,60 @@ public class TestService {
 
 
     public List<Test> getAllTests() {
-        LOG.info("TestService: getAllTests possibleAnswers");
+        LOG.info("TestService: getAllTests");
         List<Test> testList = this.testRepository.findAll();
         LOG.info("TestService: getAllTests testList -> {}", testList);
         return testList;
+    }
+
+
+    public GetExamToSitDto getExamToSitById(Long testId) {
+        LOG.info("TestService: getTestById testId -> {}", testId);
+        Optional<Test> optionalTest = this.testRepository.findById(testId);
+
+        if (optionalTest.isPresent()) {
+            Test test = optionalTest.get();
+            LOG.info("TestService: getTestById found test -> {}", test);
+
+            UserDto userDto = new UserDto();
+            userDto.setUsername(test.getCreatedBy().getUsername());
+
+            ExamDto examDto = new ExamDto();
+            examDto.setExamId(test.getTestId());
+            examDto.setExamName(test.getTestName());
+            examDto.setUserDto(userDto);
+
+            List<Question> questions = questionService.getAllQuestionsByTest(test);
+            List<QuestionDto> questionDtos = new ArrayList<>();
+
+            for (Question question : questions) {
+                List<PossibleAnswer> possibleAnswers = this.possibleAnswerRepository.findAllByQuestion(question);
+                List<PossibleAnswerDto> possibleAnswerDtos = new ArrayList<>();
+
+                for (PossibleAnswer possibleAnswer : possibleAnswers) {
+                    PossibleAnswerDto possibleAnswerDto = new PossibleAnswerDto();
+                    possibleAnswerDto.setPossibleAnswerId(possibleAnswer.getPossibleAnswerId());
+                    possibleAnswerDto.setAnswer(possibleAnswer.getAnswer());
+                    possibleAnswerDto.setCorrect(possibleAnswer.isCorrect());
+                    possibleAnswerDtos.add(possibleAnswerDto);
+                }
+
+                QuestionDto questionDto = new QuestionDto();
+                questionDto.setQuestionId(question.getQuestionId());
+                questionDto.setQuestionName(question.getQuestionName());
+                questionDto.setPossibleAnswers(possibleAnswerDtos);
+                questionDtos.add(questionDto);
+            }
+
+            GetExamToSitDto getExamToSitDto = new GetExamToSitDto();
+            getExamToSitDto.setExamDto(examDto);
+            getExamToSitDto.setQuestions(questionDtos);
+
+            return getExamToSitDto;
+        }
+
+        LOG.info("TestService: getTestById did not find test with id -> {}", testId);
+        return null;
     }
 
 
@@ -68,6 +118,19 @@ public class TestService {
 
         LOG.info("TestService: getTestById did not find test with id -> {}", testId);
         return null;
+    }
+
+
+    public List<WholeTestDto> getAllWholeExams() {
+        LOG.info("TestService: getAllWholeExams");
+        List<Test> testList = getAllTests();
+        List<WholeTestDto> wholeExams = new ArrayList<>();
+
+        for (Test test : testList) {
+            wholeExams.add(getTestWithQuestionsAndResultsById(test.getTestId()));
+        }
+
+        return wholeExams;
     }
 
 
@@ -118,7 +181,7 @@ public class TestService {
 
                 GivenAnswerDto givenAnswerDto = new GivenAnswerDto();
                 givenAnswerDto.setGivenAnswerId(givenAnswer.getGivenAnswerId());
-                givenAnswerDto.setPossibleAnswerDto(possibleAnswerDto);
+                givenAnswerDto.setPossibleAnswer(possibleAnswerDto);
 
                 givenAnswerDtos.add(givenAnswerDto);
             }
@@ -152,7 +215,7 @@ public class TestService {
     }
 
 
-    public String createNewTest(CreateTestDto2 createTestDto) {
+    public Test createNewTest(CreateTestDto2 createTestDto) {
         LOG.info("TestService: createNewTest createTestDto -> {}", createTestDto);
         User givenUser = new User();
         givenUser.setUsername(createTestDto.getUserDto().getUsername());
@@ -163,8 +226,13 @@ public class TestService {
         LOG.info("TestService: createNewTest user -> {}", user);
 
         if (user == null) {
-            LOG.info("TestService: createNewTest did not find user");
-            return "401 Unauthorized";
+            LOG.warn("TestService: createNewTest did not find user");
+            LOG.info("TestService: createNewTest sign up user");
+            user = this.authService.signup(givenUser);
+
+            if (user == null) {
+                LOG.error("TestService: createNewTest did not sign up user");
+            }
         }
 
         Test test = new Test();
@@ -195,22 +263,30 @@ public class TestService {
 
         this.questionService.saveQuestions(questions);
 
-        return "201 CREATED";
+        return test;
     }
 
 
-    public String sendTestWithAnswers(SendTestResultDto sendTestResultDto) {
+    public TestResultDto sendTestWithAnswers(SendTestResultDto sendTestResultDto) {
         User givenUser = new User();
         givenUser.setUsername(sendTestResultDto.getUserDto().getUsername());
         givenUser.setPassword(sendTestResultDto.getUserDto().getPassword());
+        LOG.info("TestService: sendTestWithAnswers givenUser -> {}", givenUser);
 
         User user = this.authService.login(givenUser);
+        LOG.info("TestService: sendTestWithAnswers logged in user -> {}", user);
 
         if (user == null) {
-            return "401 Unauthorized";
+            LOG.warn("TestService: sendTestWithAnswers did not find user");
+            LOG.info("TestService: sendTestWithAnswers sign up user");
+            user = this.authService.signup(givenUser);
+
+            if (user == null) {
+                LOG.error("TestService: sendTestWithAnswers did not sign up user");
+            }
         }
 
-        Test test = getTestById(sendTestResultDto.getTestDto().getTestId());
+        Test test = getTestById(sendTestResultDto.getExamDto().getExamId());
 
         TestResult testResult = new TestResult();
         testResult.setResult(sendTestResultDto.getResult());
@@ -219,22 +295,51 @@ public class TestService {
         testResult.setCreatedAt(new Date());
         this.testResultRepository.save(testResult);
 
-        List<SendTestResultGivenAnswerDto> givenAnswerDtos = sendTestResultDto.getGivenAnswers();
+        List<GivenAnswerDto> givenAnswerDtos = sendTestResultDto.getGivenAnswers();
         List<GivenAnswer> givenAnswers = new ArrayList<>();
-        for (SendTestResultGivenAnswerDto givenAnswerDto : givenAnswerDtos) {
+        for (GivenAnswerDto givenAnswerDto : givenAnswerDtos) {
+            PossibleAnswer possibleAnswer = this.answerService.getPossibleAnswerById(givenAnswerDto.getPossibleAnswer().getPossibleAnswerId());
+
             GivenAnswer givenAnswer = new GivenAnswer();
             givenAnswer.setTestResult(testResult);
-
-            PossibleAnswer possibleAnswer = new PossibleAnswer();
-            possibleAnswer.setPossibleAnswerId(givenAnswerDto.getPossibleAnswerDto().getPossibleAnswerId());
             givenAnswer.setAnswer(possibleAnswer);
-
             givenAnswers.add(givenAnswer);
         }
 
         this.answerService.saveGivenAnswers(givenAnswers);
 
-        return "201 CREATED";
+        UserDto userDto = new UserDto();
+        userDto.setUserId(user.getUserId());
+        userDto.setUsername(user.getUsername());
+
+        TestResultDto testResultDto = new TestResultDto();
+        testResultDto.setTestResultId(testResult.getTestResultId());
+        testResultDto.setResult(testResult.getResult());
+        testResultDto.setUserDto(userDto);
+
+        return testResultDto;
+    }
+
+
+    public TestResultDto getExamResultById(Long examResultId) {
+        Optional<TestResult> optionalTestResult = this.testResultRepository.findById(examResultId);
+
+        if (optionalTestResult.isPresent()) {
+            TestResult testResult = optionalTestResult.get();
+            TestResultDto testResultDto = new TestResultDto();
+            testResultDto.setTestResultId(testResult.getTestResultId());
+            testResultDto.setResult(testResult.getResult());
+
+            UserDto userDto = new UserDto();
+            userDto.setUserId(testResult.getCreatedBy().getUserId());
+            userDto.setUsername(testResult.getCreatedBy().getUsername());
+
+            testResultDto.setUserDto(userDto);
+
+            return testResultDto;
+        }
+
+        return null;
     }
 
 

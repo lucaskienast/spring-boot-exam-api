@@ -1,8 +1,6 @@
 package com.kienast.examapplication.controller;
 
-import com.kienast.examapplication.dto.CreateTestDto2;
-import com.kienast.examapplication.dto.SendTestResultDto;
-import com.kienast.examapplication.dto.WholeTestDto;
+import com.kienast.examapplication.dto.*;
 import com.kienast.examapplication.model.Test;
 import com.kienast.examapplication.service.TestService;
 import org.slf4j.Logger;
@@ -34,6 +32,14 @@ public class TestController {
     }
 
 
+    @GetMapping("/allWholeTest")
+    public ResponseEntity<List<WholeTestDto>> getAllWholeExams() {
+        LOG.info("TestController: getAllWholeExams");
+        List<WholeTestDto> testList = this.testService.getAllWholeExams();
+        return new ResponseEntity<>(testList, HttpStatus.OK);
+    }
+
+
     @GetMapping("/{testId}")
     public ResponseEntity<Test> getTestById(@PathVariable String testId) {
         LOG.info("TestController: getTestById testId -> {}", testId);
@@ -44,37 +50,41 @@ public class TestController {
 
     @GetMapping("/wholeTest/{testId}")
     public ResponseEntity<WholeTestDto> getWholeTestById(@PathVariable String testId) {
-        LOG.info("TestController: getTestById testId -> {}", testId);
+        LOG.info("TestController: getWholeTestById testId -> {}", testId);
         WholeTestDto wholeTest = this.testService.getTestWithQuestionsAndResultsById(Long.parseLong(testId));
         return new ResponseEntity<>(wholeTest, HttpStatus.OK);
     }
 
 
+    @GetMapping("/sit/{testId}")
+    public ResponseEntity<GetExamToSitDto> getExamToSitById(@PathVariable String testId) {
+        LOG.info("TestController: getExamToSitById testId -> {}", testId);
+        GetExamToSitDto getExamToSitDto = this.testService.getExamToSitById(Long.parseLong(testId));
+        return new ResponseEntity<>(getExamToSitDto, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/exam-result/{examId}")
+    public ResponseEntity<TestResultDto> getExamResultById(@PathVariable String examId) {
+        LOG.info("TestController: getExamResultById examResultId -> {}", examId);
+        TestResultDto examResultDto = this.testService.getExamResultById(Long.parseLong(examId));
+        return new ResponseEntity<>(examResultDto, HttpStatus.OK);
+    }
+
+
     @PostMapping("/create")
-    public ResponseEntity<String> createNewTest(@RequestBody CreateTestDto2 createTestDto) {
+    public ResponseEntity<Test> createNewTest(@RequestBody CreateTestDto2 createTestDto) {
         LOG.info("TestController: createNewTest createTestDto -> {}", createTestDto);
-        String response = this.testService.createNewTest(createTestDto);
-        if (response.equals("201 CREATED")) {
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } else if (response.equals("401 Unauthorized")) {
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
+        Test response = this.testService.createNewTest(createTestDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
     @PostMapping("/send")
-    public ResponseEntity<String> sendTestWithAnswers(@RequestBody SendTestResultDto sendTestResultDto) {
+    public ResponseEntity<TestResultDto> sendTestWithAnswers(@RequestBody SendTestResultDto sendTestResultDto) {
         LOG.info("TestController: sendTestWithAnswers sendTestResultDto -> {}", sendTestResultDto);
-        String response = this.testService.sendTestWithAnswers(sendTestResultDto);
-        if (response.equals("201 CREATED")) {
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } else if (response.equals("401 Unauthorized")) {
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
+        TestResultDto response = this.testService.sendTestWithAnswers(sendTestResultDto);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
