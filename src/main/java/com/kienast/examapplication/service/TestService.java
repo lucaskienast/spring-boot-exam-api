@@ -186,11 +186,14 @@ public class TestService {
                 givenAnswerDtos.add(givenAnswerDto);
             }
 
+            UserDto testResultUser = new UserDto();
+            testResultUser.setUsername(testResult.getCreatedBy().getUsername());
+
             TestResultDto testResultDto = new TestResultDto();
             testResultDto.setTestResultId(testResult.getTestResultId());
             testResultDto.setResult(testResult.getResult());
             testResultDto.setGivenAnswerDtos(givenAnswerDtos);
-            testResultDto.setUserDto(userDto);
+            testResultDto.setUserDto(testResultUser);
 
             testResultDtos.add(testResultDto);
         }
@@ -326,9 +329,24 @@ public class TestService {
 
         if (optionalTestResult.isPresent()) {
             TestResult testResult = optionalTestResult.get();
+            List<GivenAnswer> givenAnswers = testResult.getGivenAnswers();
+            List<GivenAnswerDto> givenAnswerDtos = new ArrayList<>();
+
+            for (GivenAnswer givenAnswer : givenAnswers) {
+                PossibleAnswerDto possibleAnswerDto = new PossibleAnswerDto();
+                possibleAnswerDto.setAnswer(givenAnswer.getAnswer().getAnswer());
+                possibleAnswerDto.setCorrect(givenAnswer.getAnswer().isCorrect());
+
+                GivenAnswerDto givenAnswerDto = new GivenAnswerDto();
+                givenAnswerDto.setPossibleAnswer(possibleAnswerDto);
+
+                givenAnswerDtos.add(givenAnswerDto);
+            }
+
             TestResultDto testResultDto = new TestResultDto();
             testResultDto.setTestResultId(testResult.getTestResultId());
             testResultDto.setResult(testResult.getResult());
+            testResultDto.setGivenAnswerDtos(givenAnswerDtos);
 
             UserDto userDto = new UserDto();
             userDto.setUserId(testResult.getCreatedBy().getUserId());
